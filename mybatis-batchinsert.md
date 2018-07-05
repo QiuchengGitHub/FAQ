@@ -124,4 +124,20 @@
 	VALUES('1','1','ip','10.0.0.1',CURRENT_DATE,CURRENT_DATE,0),('2','1','ip','10.0.0.1',CURRENT_DATE,CURRENT_DATE,0);
 
 ##问题解决##
-所以，解决办法就是直接使用mybatis的batchinsert方法即可（个人印象中，mybatis的batchinsert只是循环调用，并不是真正的batch）。
+###解决办法一###
+
+	直接使用mybatis的batchinsert方法即可（个人印象中，mybatis的batchinsert只是循环调用，并不是真正的batch）。
+
+###解决办法二###
+
+	<insert id="batchSave" parameterType="java.util.List">
+	  	BEGIN
+	  	<foreach collection="list" item="item" index= "index" separator=";">
+	  	INSERT INTO BAD_USER(ID, MSG_ID, ITEM_TYPE, ITEM_VALUE, ADD_TIME, UPDATE_TIME, DEL_FLAG) 
+	  	VALUES 
+	  	(#{item.id,jdbcType=VARCHAR},#{item.msgId,jdbcType=VARCHAR},#{item.itemType,jdbcType=VARCHAR},
+	  	#{item.itemValue,jdbcType=VARCHAR},#{item.addTime,jdbcType=TIMESTAMP},
+	  	#{item.updateTime,jdbcType=TIMESTAMP},#{item.delFlag,jdbcType=INTEGER})
+	    </foreach>
+	    ;END ;
+	  </insert>
